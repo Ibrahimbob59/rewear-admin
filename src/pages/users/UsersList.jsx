@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Search, Eye, Trash2, Filter } from 'lucide-react'
+import { Search, Eye, Trash2, Filter, Plus } from 'lucide-react'
 import { adminAPI } from '../../api/endpoints'
 import { formatDate, getStatusColor, capitalize } from '../../utils/helpers'
 import Table from '../../components/common/Table'
@@ -8,6 +8,7 @@ import Input from '../../components/common/Input'
 import Button from '../../components/common/Button'
 import UserDetailsModal from '../../components/users/UserDetailsModal'
 import DeleteConfirmModal from '../../components/users/DeleteConfirmModal'
+import AddUserModal from './AddUserModal'
 
 const UsersList = () => {
   const [users, setUsers] = useState([])
@@ -19,6 +20,7 @@ const UsersList = () => {
   const [selectedUser, setSelectedUser] = useState(null)
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showAddModal, setShowAddModal] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
 
   useEffect(() => {
@@ -147,10 +149,19 @@ const UsersList = () => {
 
   return (
     <div>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Users Management</h1>
-        <p className="text-gray-600 mt-1">Manage all platform users</p>
+      {/* Header with Add Button */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Users Management</h1>
+          <p className="text-gray-600 mt-1">Manage all platform users</p>
+        </div>
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+        >
+          <Plus className="w-5 h-5" />
+          Add User
+        </button>
       </div>
 
       {/* Filters */}
@@ -222,6 +233,14 @@ const UsersList = () => {
         }}
         onConfirm={handleDeleteConfirm}
         loading={deleteLoading}
+      />
+
+      <AddUserModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSuccess={() => {
+          fetchUsers()
+        }}
       />
     </div>
   )

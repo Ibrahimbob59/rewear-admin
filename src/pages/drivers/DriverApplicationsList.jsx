@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Search, Eye, Filter, CheckCircle, XCircle } from 'lucide-react'
+import { Search, Eye, Filter, CheckCircle, XCircle, Calendar } from 'lucide-react'
 import { adminAPI } from '../../api/endpoints'
 import { formatDate, getStatusColor, capitalize } from '../../utils/helpers'
 import Table from '../../components/common/Table'
@@ -7,6 +7,8 @@ import Pagination from '../../components/common/pagination'
 import Input from '../../components/common/Input'
 import Button from '../../components/common/Button'
 import DriverApplicationDetails from '../../components/drivers/DriverApplicationDetails'
+import SetAppointmentModal from './SetAppointmentModal'
+import ApproveRejectModal from './ApproveRejectModal'
 
 const DriverApplicationsList = () => {
   const [applications, setApplications] = useState([])
@@ -17,6 +19,10 @@ const DriverApplicationsList = () => {
   const [statusFilter, setStatusFilter] = useState('')
   const [selectedApp, setSelectedApp] = useState(null)
   const [showDetailsModal, setShowDetailsModal] = useState(false)
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false)
+  const [showActionModal, setShowActionModal] = useState(false)
+  const [selectedDriver, setSelectedDriver] = useState(null)
+  const [actionType, setActionType] = useState('approve')
 
   useEffect(() => {
     fetchApplications()
@@ -39,39 +45,37 @@ const DriverApplicationsList = () => {
     }
   }
 
-  const handleApprove = async (id) => {
-    try {
-      await adminAPI.approveDriver(id)
-      setShowDetailsModal(false)
-      setSelectedApp(null)
-      fetchApplications()
-      alert('Driver approved successfully!')
-    } catch (error) {
-      console.error('Failed to approve driver:', error)
-      alert('Failed to approve driver')
-    }
+  const handleSetAppointment = (driver) => {
+    setSelectedDriver(driver)
+    setShowAppointmentModal(true)
   }
 
-  const handleReject = async (id, reason) => {
-    try {
-      await adminAPI.rejectDriver(id, reason)
-      setShowDetailsModal(false)
-      setSelectedApp(null)
-      fetchApplications()
-      alert('Driver application rejected')
-    } catch (error) {
-      console.error('Failed to reject driver:', error)
-      alert('Failed to reject driver')
-    }
+  const handleApprove = (driver) => {
+    setSelectedDriver(driver)
+    setActionType('approve')
+    setShowActionModal(true)
+  }
+
+  const handleReject = (driver) => {
+    setSelectedDriver(driver)
+    setActionType('reject')
+    setShowActionModal(true)
   }
 
   const columns = [
     {
-      header: 'Applicant',
+      header: 'Driver',
       render: (row) => (
-        <div>
-          <p className="font-medium">{row.full_name}</p>
-          <p className="text-xs text-gray-500">{row.email}</p>
+        <div className="flex items-center">
+          <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-3">
+            <span className="text-sm font-medium text-primary-600">
+              {row.name.charAt(0).toUpperCase()}
+            </span>
+          </div>
+          <div>
+            <p className="font-medium">{row.name}</p>
+            <p className="text-xs text-gray-500">{row.email}</p>
+          </div>
         </div>
       ),
     },
@@ -80,29 +84,26 @@ const DriverApplicationsList = () => {
       accessor: 'phone',
     },
     {
-      header: 'Location',
-      render: (row) => (
-        <span className="text-sm">{row.city}</span>
-      ),
-    },
-    {
       header: 'Vehicle',
       render: (row) => (
-        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs uppercase">
-          {row.vehicle_type}
-        </span>
+        <div>
+          <p className="text-sm">{row.vehicle_make || 'N/A'} {row.vehicle_model || ''}</p>
+          <p className="text-xs text-gray-500">{row.license_plate || 'N/A'}</p>
+        </div>
       ),
     },
     {
       header: 'Status',
+      accessor: 'status',
       render: (row) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(row.status)}`}>
-          {capitalize(row.status.replace('_', ' '))}
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(row.status || 'pending')}`}>
+          {capitalize(row.status || 'pending')}
         </span>
       ),
     },
     {
       header: 'Applied',
+      accessor: 'created_at',
       render: (row) => (
         <span className="text-sm text-gray-600">{formatDate(row.created_at)}</span>
       ),
@@ -110,67 +111,55 @@ const DriverApplicationsList = () => {
     {
       header: 'Actions',
       render: (row) => (
-        <div className="flex space-x-2">
+        <div className="flex gap-2">
           <button
-            onClick={() => { setSelectedApp(row); setShowDetailsModal(true); }}
-            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+            onClick={() => handleSetAppointment(row)}
+            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            title="Schedule Appointment"
+          >
+            <Calendar className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => handleApprove(row)}
+            className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+            title="Approve"
+          >
+            <CheckCircle className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => handleReject(row)}
+            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            title="Reject"
+          >
+            <XCircle className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => {
+              setSelectedApp(row)
+              setShowDetailsModal(true)
+            }}
+            className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
             title="View Details"
           >
             <Eye className="w-4 h-4" />
           </button>
-          {row.status === 'pending' && (
-            <>
-              <button
-                onClick={() => handleApprove(row.id)}
-                className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
-                title="Approve"
-              >
-                <CheckCircle className="w-4 h-4" />
-              </button>
-            </>
-          )}
         </div>
       ),
     },
   ]
 
-  const stats = {
-    total: applications.length,
-    pending: applications.filter(a => a.status === 'pending').length,
-    approved: applications.filter(a => a.status === 'approved').length,
-    rejected: applications.filter(a => a.status === 'rejected').length,
-  }
-
   return (
     <div>
+      {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Driver Applications</h1>
-        <p className="text-gray-600 mt-1">Review and approve driver applications</p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-          <p className="text-sm text-gray-600">Total Applications</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{stats.total}</p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4 border border-yellow-200">
-          <p className="text-sm text-yellow-600">Pending</p>
-          <p className="text-2xl font-bold text-yellow-600 mt-1">{stats.pending}</p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4 border border-green-200">
-          <p className="text-sm text-green-600">Approved</p>
-          <p className="text-2xl font-bold text-green-600 mt-1">{stats.approved}</p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4 border border-red-200">
-          <p className="text-sm text-red-600">Rejected</p>
-          <p className="text-2xl font-bold text-red-600 mt-1">{stats.rejected}</p>
-        </div>
+        <p className="text-gray-600 mt-1">Review and manage driver applications</p>
       </div>
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow p-4 mb-6 border border-gray-200">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Search */}
           <div className="md:col-span-2">
             <Input
               placeholder="Search by name or email..."
@@ -179,6 +168,8 @@ const DriverApplicationsList = () => {
               icon={Search}
             />
           </div>
+
+          {/* Status Filter */}
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -186,11 +177,12 @@ const DriverApplicationsList = () => {
           >
             <option value="">All Status</option>
             <option value="pending">Pending</option>
-            <option value="under_review">Under Review</option>
+            <option value="scheduled">Scheduled</option>
             <option value="approved">Approved</option>
             <option value="rejected">Rejected</option>
           </select>
         </div>
+
         <div className="mt-4 flex justify-end">
           <Button onClick={fetchApplications} size="sm">
             <Filter className="w-4 h-4 mr-2" />
@@ -199,18 +191,50 @@ const DriverApplicationsList = () => {
         </div>
       </div>
 
-      <Table columns={columns} data={applications} loading={loading} emptyMessage="No applications found" />
+      {/* Applications Table */}
+      <Table
+        columns={columns}
+        data={applications}
+        loading={loading}
+        emptyMessage="No driver applications found"
+      />
 
+      {/* Pagination */}
       {totalPages > 1 && (
-        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       )}
 
+      {/* Modals */}
       <DriverApplicationDetails
         application={selectedApp}
         isOpen={showDetailsModal}
-        onClose={() => { setShowDetailsModal(false); setSelectedApp(null); }}
-        onApprove={handleApprove}
-        onReject={handleReject}
+        onClose={() => {
+          setShowDetailsModal(false)
+          setSelectedApp(null)
+        }}
+      />
+
+      <SetAppointmentModal
+        isOpen={showAppointmentModal}
+        onClose={() => setShowAppointmentModal(false)}
+        driver={selectedDriver}
+        onSuccess={() => {
+          fetchApplications()
+        }}
+      />
+
+      <ApproveRejectModal
+        isOpen={showActionModal}
+        onClose={() => setShowActionModal(false)}
+        driver={selectedDriver}
+        action={actionType}
+        onSuccess={() => {
+          fetchApplications()
+        }}
       />
     </div>
   )
