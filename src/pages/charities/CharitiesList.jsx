@@ -30,10 +30,14 @@ const CharitiesList = () => {
 
       const response = await adminAPI.getCharities(params)
       const data = response.data.data
-      setCharities(data.data || data)
-      setTotalPages(data.last_page || 1)
+
+      // Handle both direct array and paginated response formats
+      const charitiesArray = Array.isArray(data) ? data : (data?.data || [])
+      setCharities(charitiesArray)
+      setTotalPages(data?.last_page || 1)
     } catch (error) {
       console.error('Failed to fetch charities:', error)
+      setCharities([])
     } finally {
       setLoading(false)
     }

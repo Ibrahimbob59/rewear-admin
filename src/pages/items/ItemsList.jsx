@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Search, Eye, Trash2, Filter, ToggleLeft, ToggleRight } from 'lucide-react'
 import { itemsAPI, adminAPI } from '../../api/endpoints'
-import { formatDate, formatCurrency, getStatusColor, capitalize } from '../../utils/helpers'
+import {
+  formatDate,
+  formatCurrency,
+  getDeliveryStatusBadge,
+  capitalize,
+} from '../../utils/helpers'
 import Table from '../../components/common/Table'
 import Pagination from '../../components/common/pagination'
 import Input from '../../components/common/Input'
@@ -32,14 +37,31 @@ const ItemsList = () => {
       const params = { page: currentPage }
       if (searchTerm) params.search = searchTerm
       if (categoryFilter) params.category = categoryFilter
-      if (statusFilter) params.status = statusFilter
+      // Note: status filter is applied client-side since backend doesn't support it
 
       const response = await itemsAPI.getItems(params)
       const data = response.data.data
-      setItems(data.data || data)
-      setTotalPages(data.last_page || 1)
+
+      // Handle different response structures
+      let itemsArray = []
+      if (Array.isArray(data)) {
+        itemsArray = data
+      } else if (Array.isArray(data?.items)) {
+        itemsArray = data.items
+      } else if (Array.isArray(data?.data)) {
+        itemsArray = data.data
+      }
+
+      // Apply status filter client-side (backend doesn't support it)
+      if (statusFilter) {
+        itemsArray = itemsArray.filter(item => item.status === statusFilter)
+      }
+
+      setItems(itemsArray)
+      setTotalPages(data?.last_page || data?.meta?.last_page || 1)
     } catch (error) {
       console.error('Failed to fetch items:', error)
+      setItems([])
     } finally {
       setLoading(false)
     }
@@ -76,7 +98,7 @@ const ItemsList = () => {
       render: (row) => (
         <div className="flex items-center">
           <img
-            src={row.images?.[0]?.image_url || '/placeholder.jpg'}
+            src={row.images?.[0]?.url || row.primary_image || '/placeholder.jpg'}
             alt={row.title}
             className="w-12 h-12 object-cover rounded-lg mr-3"
           />
@@ -115,7 +137,7 @@ const ItemsList = () => {
     {
       header: 'Status',
       render: (row) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(row.status)}`}>
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDeliveryStatusBadge(row.status)}`}>
           {capitalize(row.status)}
         </span>
       ),

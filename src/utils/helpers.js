@@ -40,22 +40,44 @@ export const getErrorMessage = (error) => {
   return 'An unexpected error occurred'
 }
 
-// Get status color
-export const getStatusColor = (status) => {
+// Delivery Status Helpers
+export const getDeliveryStatusColor = (status) => {
   const colors = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    confirmed: 'bg-blue-100 text-blue-800',
-    in_delivery: 'bg-purple-100 text-purple-800',
-    delivered: 'bg-green-100 text-green-800',
-    completed: 'bg-green-100 text-green-800',
-    cancelled: 'bg-red-100 text-red-800',
-    rejected: 'bg-red-100 text-red-800',
-    approved: 'bg-green-100 text-green-800',
-    active: 'bg-green-100 text-green-800',
-    inactive: 'bg-gray-100 text-gray-800',
+    pending: 'orange',
+    assigned: 'blue',
+    in_transit: 'indigo',
+    delivered: 'green',
+    cancelled: 'red',
   }
-  return colors[status] || 'bg-gray-100 text-gray-800'
+  return colors[status] || 'gray'
 }
+
+export const getDeliveryStatusDisplay = (status) => {
+  const displays = {
+    pending: 'Pending',
+    assigned: 'Assigned',
+    in_transit: 'In Transit',
+    delivered: 'Delivered',
+    cancelled: 'Cancelled',
+  }
+  return displays[status] || status
+}
+
+export const getDeliveryStatusBadge = (status) => {
+  const colors = {
+    pending: 'bg-orange-100 text-orange-800',
+    assigned: 'bg-blue-100 text-blue-800',
+    in_transit: 'bg-indigo-100 text-indigo-800',
+    delivered: 'bg-green-100 text-green-800',
+    cancelled: 'bg-red-100 text-red-800',
+  }
+  return `px-3 py-1 rounded-full text-xs font-medium ${
+    colors[status] || 'bg-gray-100 text-gray-800'
+  }`
+}
+
+// Backward-compat (if any code still uses the old name)
+export const getDeliveryStatusBadgeClass = (status) => getDeliveryStatusBadge(status)
 
 // Capitalize first letter
 export const capitalize = (str) => {

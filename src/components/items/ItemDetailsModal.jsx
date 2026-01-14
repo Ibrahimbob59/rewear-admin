@@ -14,7 +14,7 @@ const ItemDetailsModal = ({ item, isOpen, onClose }) => {
             item.images.map((img, idx) => (
               <img
                 key={idx}
-                src={img.image_url}
+                src={img.url || img.image_url}
                 alt={item.title}
                 className="w-full h-32 object-cover rounded-lg border"
               />

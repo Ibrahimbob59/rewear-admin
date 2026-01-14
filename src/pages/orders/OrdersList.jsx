@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Search, Eye, Filter, XCircle } from 'lucide-react'
 import { ordersAPI } from '../../api/endpoints'
-import { formatDate, formatCurrency, getStatusColor, capitalize } from '../../utils/helpers'
+import {
+  formatDate,
+  formatCurrency,
+  getDeliveryStatusBadge,
+  capitalize,
+} from '../../utils/helpers'
 import Table from '../../components/common/Table'
 import Pagination from '../../components/common/pagination'
 import Input from '../../components/common/Input'
@@ -26,14 +31,32 @@ const OrdersList = () => {
     try {
       setLoading(true)
       const params = { page: currentPage }
-      if (statusFilter) params.status = statusFilter
+      if (searchTerm) params.search = searchTerm
+      // Note: status filter applied client-side since backend API doesn't document support for it
 
       const response = await ordersAPI.getOrders(params)
       const data = response.data.data
-      setOrders(data.data || data)
-      setTotalPages(data.last_page || 1)
+
+      // Handle different response structures
+      let ordersArray = []
+      if (Array.isArray(data)) {
+        ordersArray = data
+      } else if (Array.isArray(data?.items)) {
+        ordersArray = data.items
+      } else if (Array.isArray(data?.data)) {
+        ordersArray = data.data
+      }
+
+      // Apply status filter client-side
+      if (statusFilter) {
+        ordersArray = ordersArray.filter(order => order.status === statusFilter)
+      }
+
+      setOrders(ordersArray)
+      setTotalPages(data?.last_page || data?.meta?.last_page || 1)
     } catch (error) {
       console.error('Failed to fetch orders:', error)
+      setOrders([])
     } finally {
       setLoading(false)
     }
@@ -67,7 +90,7 @@ const OrdersList = () => {
       render: (row) => (
         <div className="flex items-center">
           <img
-            src={row.item?.images?.[0]?.image_url || '/placeholder.jpg'}
+            src={row.item?.images?.[0]?.url || row.item?.primary_image || '/placeholder.jpg'}
             alt={row.item?.title}
             className="w-10 h-10 object-cover rounded mr-3"
           />
@@ -105,7 +128,7 @@ const OrdersList = () => {
     {
       header: 'Status',
       render: (row) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(row.status)}`}>
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDeliveryStatusBadge(row.status)}`}>
           {capitalize(row.status)}
         </span>
       ),

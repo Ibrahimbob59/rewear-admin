@@ -15,7 +15,7 @@ const AddUserModal = ({ isOpen, onClose, onSuccess }) => {
     password: '',
     phone: '',
     city: '',
-    role: 'user',
+    user_type: 'user',
   })
   const [errors, setErrors] = useState({})
 
@@ -45,14 +45,14 @@ const AddUserModal = ({ isOpen, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     if (!validate()) return
 
     setLoading(true)
 
     try {
       const response = await adminAPI.createUser(formData)
-      
+
       if (response.data.success) {
         showToast('User created successfully', 'success')
         onSuccess()
@@ -61,7 +61,7 @@ const AddUserModal = ({ isOpen, onClose, onSuccess }) => {
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to create user'
       showToast(message, 'error')
-      
+
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors)
       }
@@ -77,7 +77,7 @@ const AddUserModal = ({ isOpen, onClose, onSuccess }) => {
       password: '',
       phone: '',
       city: '',
-      role: 'user',
+      user_type: 'user',
     })
     setErrors({})
     onClose()
@@ -146,18 +146,23 @@ const AddUserModal = ({ isOpen, onClose, onSuccess }) => {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             <Shield className="w-4 h-4 inline mr-1" />
-            Role
+            User Type
           </label>
           <select
-            name="role"
-            value={formData.role}
+            name="user_type"
+            value={formData.user_type}
             onChange={handleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="user">User</option>
-            <option value="charity">Charity</option>
             <option value="driver">Driver</option>
           </select>
+          <p className="text-xs text-gray-500 mt-1">
+            {formData.user_type === 'driver'
+              ? 'Driver will be created with immediate access to driver dashboard and delivery features'
+              : 'For charity accounts, use the "Create Charity" button in Charities page'
+            }
+          </p>
         </div>
 
         <div className="flex gap-3 pt-4">

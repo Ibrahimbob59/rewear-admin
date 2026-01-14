@@ -11,6 +11,8 @@ import DriverApplicationsList from './pages/drivers/DriverApplicationsList'
 import CharitiesList from './pages/charities/CharitiesList'
 import DeliveriesList from './pages/deliveries/DeliveriesList'
 import AnalyticsDashboard from './pages/analytics/AnalyticsDashboard'
+import Profile from './pages/Profile'
+import Notifications from './pages/Notifications'
 import Layout from './components/layout/layout'
 
 function App() {
@@ -36,6 +38,8 @@ function App() {
               <Route path="charities" element={<CharitiesList />} />
               <Route path="deliveries" element={<DeliveriesList />} />
               <Route path="analytics" element={<AnalyticsDashboard />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="notifications" element={<Notifications />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

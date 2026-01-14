@@ -13,9 +13,12 @@ const Dashboard = () => {
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [userGrowthData, setUserGrowthData] = useState([])
+  const [recentActivities, setRecentActivities] = useState([])
 
   useEffect(() => {
     fetchStats()
+    fetchDashboardData()
   }, [])
 
   const fetchStats = async () => {
@@ -29,6 +32,68 @@ const Dashboard = () => {
       setError('Failed to load dashboard statistics')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchDashboardData = async () => {
+    try {
+      // Fetch recent users to calculate growth and activities
+      const usersResponse = await adminAPI.getUsers({ per_page: 100 })
+
+      // Handle different response structures
+      let users = []
+      const responseData = usersResponse.data.data
+
+      if (Array.isArray(responseData)) {
+        users = responseData
+      } else if (Array.isArray(responseData?.data)) {
+        users = responseData.data
+      }
+
+      // Calculate user growth by month
+      const growthMap = {}
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+      users.forEach(user => {
+        if (user.created_at) {
+          const date = new Date(user.created_at)
+          const month = monthNames[date.getMonth()]
+          const year = date.getFullYear()
+          const key = `${month} ${year}`
+
+          if (!growthMap[key]) {
+            growthMap[key] = { month, year, count: 0, users: [] }
+          }
+          growthMap[key].count++
+          growthMap[key].users.push(user)
+        }
+      })
+
+      // Convert to array and get last 6 months
+      const growthArray = Object.values(growthMap)
+        .sort((a, b) => {
+          if (a.year !== b.year) return a.year - b.year
+          return monthNames.indexOf(a.month) - monthNames.indexOf(b.month)
+        })
+        .slice(-6)
+        .map(item => ({ month: item.month, users: item.count }))
+
+      setUserGrowthData(growthArray.length > 0 ? growthArray : [])
+
+      // Create recent activities from users (most recent 5)
+      const activities = users
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 5)
+        .map(user => ({
+          type: 'user',
+          title: 'New User Registered',
+          description: `${user.name} joined the platform`,
+          created_at: user.created_at,
+        }))
+
+      setRecentActivities(activities)
+    } catch (err) {
+      console.error('Failed to fetch dashboard data:', err)
     }
   }
 
@@ -54,28 +119,6 @@ const Dashboard = () => {
     )
   }
 
-  // Mock recent activity - replace with real API later
-  const recentActivities = [
-    {
-      type: 'user',
-      title: 'New User Registered',
-      description: 'John Doe joined the platform',
-      created_at: new Date().toISOString(),
-    },
-    {
-      type: 'item',
-      title: 'New Item Listed',
-      description: 'Vintage Jacket posted by Sarah',
-      created_at: new Date(Date.now() - 3600000).toISOString(),
-    },
-    {
-      type: 'order',
-      title: 'Order Completed',
-      description: 'Order #1234 delivered successfully',
-      created_at: new Date(Date.now() - 7200000).toISOString(),
-    },
-  ]
-
   return (
     <div>
       {/* Welcome Section */}
@@ -94,28 +137,25 @@ const Dashboard = () => {
           title="Total Users"
           value={stats?.total_users || 0}
           icon={Users}
-          trend="+12% from last month"
           color="blue"
         />
         <StatCard
           title="Items Sold"
           value={stats?.items_sold || 0}
           icon={ShoppingBag}
-          trend="+8% from last month"
           color="green"
         />
         <StatCard
           title="Total Donations"
           value={stats?.total_donations || 0}
           icon={Heart}
-          trend="+15% from last month"
           color="purple"
         />
         <StatCard
           title="Active Drivers"
           value={stats?.verified_drivers || 0}
           icon={Truck}
-          trend={`${stats?.total_drivers || 0} total`}
+          subtitle={`${stats?.total_drivers || 0} total drivers`}
           color="orange"
         />
       </div>
@@ -155,8 +195,9 @@ const Dashboard = () => {
             <div>
               <p className="text-sm text-gray-600">Total Items</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
-                {(stats?.items_sold || 0) + 150}
+                {stats?.active_listings || 0}
               </p>
+              <p className="text-xs text-gray-500">Active listings</p>
             </div>
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
               <Package className="w-6 h-6 text-blue-600" />
@@ -169,12 +210,19 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* User Growth Chart */}
         <div className="bg-white rounded-lg shadow border border-gray-200">
-          <UserGrowthChart />
+          <UserGrowthChart data={userGrowthData} />
         </div>
 
         {/* Recent Activity */}
         <div className="bg-white rounded-lg shadow border border-gray-200">
-          <RecentActivity activities={recentActivities} />
+          {recentActivities.length > 0 ? (
+            <RecentActivity activities={recentActivities} />
+          ) : (
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+              <p className="text-sm text-gray-500">No recent activity to display</p>
+            </div>
+          )}
         </div>
       </div>
 

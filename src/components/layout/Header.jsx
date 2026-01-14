@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { Menu, Bell, User, LogOut, Settings } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 const Header = ({ toggleSidebar }) => {
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
   const [showDropdown, setShowDropdown] = useState(false)
   const dropdownRef = useRef(null)
 
@@ -21,6 +23,7 @@ const Header = ({ toggleSidebar }) => {
 
   const handleLogout = async () => {
     await logout()
+    navigate('/login')
   }
 
   return (
@@ -41,10 +44,12 @@ const Header = ({ toggleSidebar }) => {
       {/* Right Section */}
       <div className="flex items-center space-x-4">
         {/* Notifications */}
-        <button className="relative p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+        <Link
+          to="/notifications"
+          className="relative p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+        >
           <Bell className="w-6 h-6" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-        </button>
+        </Link>
 
         {/* User Profile Dropdown */}
         <div className="relative" ref={dropdownRef}>
@@ -69,10 +74,14 @@ const Header = ({ toggleSidebar }) => {
                 <p className="text-xs text-gray-500">{user?.email}</p>
               </div>
 
-              <button className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+              <Link
+                to="/profile"
+                className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                onClick={() => setShowDropdown(false)}
+              >
                 <Settings className="w-4 h-4 mr-3" />
                 Settings
-              </button>
+              </Link>
 
               <button
                 onClick={handleLogout}

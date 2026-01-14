@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Search, Eye, Filter, CheckCircle, XCircle, Calendar } from 'lucide-react'
 import { adminAPI } from '../../api/endpoints'
-import { formatDate, getStatusColor, capitalize } from '../../utils/helpers'
+import {
+  formatDate,
+  formatCurrency,
+  getDeliveryStatusBadge,
+  capitalize,
+} from '../../utils/helpers'
 import Table from '../../components/common/Table'
 import Pagination from '../../components/common/pagination'
 import Input from '../../components/common/Input'
@@ -36,10 +41,14 @@ const DriverApplicationsList = () => {
 
       const response = await adminAPI.getDriverApplications(params)
       const data = response.data.data
-      setApplications(data.data || data)
-      setTotalPages(data.last_page || 1)
+
+      // Handle both direct array and paginated response formats
+      const applicationsArray = Array.isArray(data) ? data : (data?.data || [])
+      setApplications(applicationsArray)
+      setTotalPages(data?.last_page || 1)
     } catch (error) {
       console.error('Failed to fetch applications:', error)
+      setApplications([])
     } finally {
       setLoading(false)
     }
@@ -69,12 +78,12 @@ const DriverApplicationsList = () => {
         <div className="flex items-center">
           <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-3">
             <span className="text-sm font-medium text-primary-600">
-              {row.name.charAt(0).toUpperCase()}
+              {row?.name?.charAt(0)?.toUpperCase() || '?'}
             </span>
           </div>
           <div>
-            <p className="font-medium">{row.name}</p>
-            <p className="text-xs text-gray-500">{row.email}</p>
+            <p className="font-medium">{row?.name || 'N/A'}</p>
+            <p className="text-xs text-gray-500">{row?.email || 'N/A'}</p>
           </div>
         </div>
       ),
@@ -96,7 +105,7 @@ const DriverApplicationsList = () => {
       header: 'Status',
       accessor: 'status',
       render: (row) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(row.status || 'pending')}`}>
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDeliveryStatusBadge(row.status || 'pending')}`}>
           {capitalize(row.status || 'pending')}
         </span>
       ),

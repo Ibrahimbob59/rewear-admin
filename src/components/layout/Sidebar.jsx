@@ -8,6 +8,8 @@ import {
   Heart,
   Building2,
   BarChart3,
+  User,
+  Bell,
 } from 'lucide-react'
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
@@ -73,6 +75,44 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               </li>
             ))}
           </ul>
+
+          {/* Bottom Section */}
+          <div className="mt-6 pt-4 border-t border-gray-200">
+            <ul className="space-y-1">
+              <li>
+                <NavLink
+                  to="/profile"
+                  className={({ isActive }) =>
+                    `flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                      isActive
+                        ? 'bg-primary-50 text-primary-700 font-medium'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`
+                  }
+                  onClick={() => setIsOpen(false)}
+                >
+                  <User className="w-5 h-5 mr-3" />
+                  <span>Profile</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/notifications"
+                  className={({ isActive }) =>
+                    `flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                      isActive
+                        ? 'bg-primary-50 text-primary-700 font-medium'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`
+                  }
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Bell className="w-5 h-5 mr-3" />
+                  <span>Notifications</span>
+                </NavLink>
+              </li>
+            </ul>
+          </div>
         </nav>
 
         {/* Footer */}

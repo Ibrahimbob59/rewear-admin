@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Search, Eye, Filter, Truck, Package, CheckCircle } from 'lucide-react'
 import { deliveriesAPI } from '../../api/endpoints'
-import { formatDate, formatCurrency, getStatusColor, capitalize } from '../../utils/helpers'
+import {
+  formatDate,
+  formatCurrency,
+  getDeliveryStatusBadge,
+  capitalize,
+} from '../../utils/helpers'
 import Table from '../../components/common/Table'
 import Pagination from '../../components/common/pagination'
 import Input from '../../components/common/Input'
@@ -30,10 +35,14 @@ const DeliveriesList = () => {
 
       const response = await deliveriesAPI.getDeliveries(params)
       const data = response.data.data
-      setDeliveries(data.data || data)
-      setTotalPages(data.last_page || 1)
+
+      // Handle both direct array and paginated response formats
+      const deliveriesArray = Array.isArray(data) ? data : (data?.data || [])
+      setDeliveries(deliveriesArray)
+      setTotalPages(data?.last_page || 1)
     } catch (error) {
       console.error('Failed to fetch deliveries:', error)
+      setDeliveries([])
     } finally {
       setLoading(false)
     }
@@ -75,9 +84,7 @@ const DeliveriesList = () => {
     },
     {
       header: 'Distance',
-      render: (row) => (
-        <span className="text-sm">{row.distance_km || 0} km</span>
-      ),
+      render: (row) => <span className="text-sm">{row.distance_km || 0} km</span>,
     },
     {
       header: 'Fee',
@@ -91,7 +98,7 @@ const DeliveriesList = () => {
     {
       header: 'Status',
       render: (row) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(row.status)}`}>
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDeliveryStatusBadge(row.status)}`}>
           {capitalize(row.status.replace('_', ' '))}
         </span>
       ),
@@ -100,7 +107,10 @@ const DeliveriesList = () => {
       header: 'Actions',
       render: (row) => (
         <button
-          onClick={() => { setSelectedDelivery(row); setShowDetailsModal(true); }}
+          onClick={() => {
+            setSelectedDelivery(row)
+            setShowDetailsModal(true)
+          }}
           className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
           title="View Details"
         >
@@ -112,10 +122,10 @@ const DeliveriesList = () => {
 
   const stats = {
     total: deliveries.length,
-    pending: deliveries.filter(d => d.status === 'pending').length,
-    active: deliveries.filter(d => ['assigned', 'picked_up', 'in_transit'].includes(d.status)).length,
-    completed: deliveries.filter(d => d.status === 'delivered').length,
-    failed: deliveries.filter(d => d.status === 'failed').length,
+    pending: deliveries.filter((d) => d.status === 'pending').length,
+    active: deliveries.filter((d) => ['assigned', 'picked_up', 'in_transit'].includes(d.status)).length,
+    completed: deliveries.filter((d) => d.status === 'delivered').length,
+    failed: deliveries.filter((d) => d.status === 'failed').length,
   }
 
   return (
@@ -176,20 +186,25 @@ const DeliveriesList = () => {
               icon={Search}
             />
           </div>
+
+          {/* ✅ Updated status filter dropdown */}
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            onChange={(e) => {
+              setStatusFilter(e.target.value)
+              setCurrentPage(1)
+            }}
+            className="rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">All Status</option>
             <option value="pending">Pending</option>
             <option value="assigned">Assigned</option>
-            <option value="picked_up">Picked Up</option>
             <option value="in_transit">In Transit</option>
             <option value="delivered">Delivered</option>
-            <option value="failed">Failed</option>
+            <option value="cancelled">Cancelled</option>
           </select>
         </div>
+
         <div className="mt-4 flex justify-end">
           <Button onClick={fetchDeliveries} size="sm">
             <Filter className="w-4 h-4 mr-2" />
@@ -207,7 +222,10 @@ const DeliveriesList = () => {
       <DeliveryDetailsModal
         delivery={selectedDelivery}
         isOpen={showDetailsModal}
-        onClose={() => { setShowDetailsModal(false); setSelectedDelivery(null); }}
+        onClose={() => {
+          setShowDetailsModal(false)
+          setSelectedDelivery(null)
+        }}
       />
     </div>
   )

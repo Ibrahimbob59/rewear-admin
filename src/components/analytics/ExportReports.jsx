@@ -34,16 +34,21 @@ const ExportReports = ({ onExport }) => {
   ]
 
   const handleExport = (reportId, format) => {
-    if (onExport) {
-      onExport(reportId, format)
-    } else {
-      alert(`Exporting ${reportId} as ${format}...`)
-    }
+    // Export functionality requires backend endpoints
+    // Needed endpoints:
+    // - GET /api/admin/reports/users?format=csv
+    // - GET /api/admin/reports/orders?format=pdf
+    // - GET /api/admin/reports/revenue?format=csv
+    // - GET /api/admin/reports/deliveries?format=pdf
+    alert(`Report export feature coming soon!\n\nBackend endpoints needed for:\n- ${reportId} report in ${format} format\n\nContact backend team to implement report generation endpoints.`)
   }
 
   return (
     <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Export Reports</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-gray-900">Export Reports</h3>
+        <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Backend Implementation Pending</span>
+      </div>
       <div className="space-y-4">
         {reports.map((report) => (
           <div key={report.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
@@ -70,6 +75,11 @@ const ExportReports = ({ onExport }) => {
             </div>
           </div>
         ))}
+      </div>
+      <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <p className="text-xs text-blue-800">
+          <strong>Note:</strong> Report export requires backend implementation. The backend needs to provide endpoints to generate and download reports in CSV and PDF formats.
+        </p>
       </div>
     </div>
   )

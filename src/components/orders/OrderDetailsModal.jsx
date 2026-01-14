@@ -1,5 +1,10 @@
 import Modal from '../common/Modal'
-import { formatDate, formatCurrency, getStatusColor, capitalize } from '../../utils/helpers'
+import {
+  formatDate,
+  formatCurrency,
+  getDeliveryStatusBadge,
+  capitalize,
+} from '../../utils/helpers'
 import { Package, User, MapPin, Truck, DollarSign, Calendar, Clock } from 'lucide-react'
 
 const OrderDetailsModal = ({ order, isOpen, onClose }) => {
@@ -50,7 +55,7 @@ const OrderDetailsModal = ({ order, isOpen, onClose }) => {
       <div className="space-y-6">
         {/* Status Badge */}
         <div className="flex items-center justify-between">
-          <span className={`px-4 py-2 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
+          <span className={`px-4 py-2 rounded-full text-sm font-medium ${getDeliveryStatusBadge(order.status)}`}>
             {capitalize(order.status)}
           </span>
           <span className="text-sm text-gray-500">
@@ -65,7 +70,7 @@ const OrderDetailsModal = ({ order, isOpen, onClose }) => {
         <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
           <div className="flex items-center space-x-4">
             <img
-              src={order.item?.images?.[0]?.image_url || '/placeholder.jpg'}
+              src={order.item?.images?.[0]?.url || order.item?.primary_image || '/placeholder.jpg'}
               alt={order.item?.title}
               className="w-20 h-20 object-cover rounded-lg"
             />

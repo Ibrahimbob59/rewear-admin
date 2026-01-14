@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Search, Eye, Trash2, Filter, Plus } from 'lucide-react'
 import { adminAPI } from '../../api/endpoints'
-import { formatDate, getStatusColor, capitalize } from '../../utils/helpers'
+import {
+  formatDate,
+  formatCurrency,
+  getDeliveryStatusBadge,
+  capitalize,
+} from '../../utils/helpers'
 import Table from '../../components/common/Table'
 import Pagination from '../../components/common/pagination'
 import Input from '../../components/common/Input'
@@ -39,10 +44,15 @@ const UsersList = () => {
       }
 
       const response = await adminAPI.getUsers(params)
-      setUsers(response.data.data.data)
-      setTotalPages(response.data.data.last_page)
+      const data = response.data.data
+
+      // Handle both direct array and paginated response formats
+      const usersArray = Array.isArray(data) ? data : (data?.data || [])
+      setUsers(usersArray)
+      setTotalPages(data?.last_page || 1)
     } catch (error) {
       console.error('Failed to fetch users:', error)
+      setUsers([])
     } finally {
       setLoading(false)
     }
@@ -103,7 +113,7 @@ const UsersList = () => {
       header: 'Type',
       accessor: 'user_type',
       render: (row) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(row.user_type)}`}>
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDeliveryStatusBadge(row.user_type)}`}>
           {capitalize(row.user_type)}
         </span>
       ),
