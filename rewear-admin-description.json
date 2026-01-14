@@ -1,0 +1,1191 @@
+{
+  "project_metadata": {
+    "project_name": "ReWear Admin Dashboard",
+    "version": "1.0.0",
+    "project_type": "React Single Page Application (SPA)",
+    "description": "Complete administrative dashboard for managing the ReWear sustainable fashion platform - a platform for donating, purchasing, and delivering second-hand clothing items with charity partnerships",
+    "repository": "rewear-admin",
+    "default_admin_credentials": {
+      "email": "admin@rewear.com",
+      "password": "Admin@12345"
+    },
+    "development_server": "http://localhost:3000",
+    "api_base_url": "http://localhost:8000/api"
+  },
+
+  "project_purpose": {
+    "overview": "The ReWear Admin Dashboard serves as the central control panel for administrators to manage all aspects of the sustainable fashion platform. It provides comprehensive tools for user management, item oversight, order processing, driver verification, charity coordination, delivery tracking, and platform analytics.",
+    "target_users": ["Platform Administrators", "System Operators"],
+    "key_business_functions": [
+      "Monitor and manage platform users (regular users, charities, drivers)",
+      "Oversee donated items listings and inventory",
+      "Process and track customer orders",
+      "Verify and approve driver applications",
+      "Manage charity organization partnerships",
+      "Track delivery logistics and driver assignments",
+      "Analyze platform performance and generate reports",
+      "Handle system notifications and communications"
+    ]
+  },
+
+  "technology_stack": {
+    "frontend_framework": {
+      "name": "React",
+      "version": "18.3.1",
+      "purpose": "Core UI framework for building the user interface",
+      "key_features_used": [
+        "Functional components with Hooks",
+        "Context API for state management",
+        "React Router for navigation",
+        "JSX for component templating"
+      ]
+    },
+    "build_tool": {
+      "name": "Vite",
+      "version": "5.1.4",
+      "purpose": "Modern build tool and development server",
+      "features": ["Hot Module Replacement", "Fast development server", "Optimized production builds"]
+    },
+    "routing": {
+      "name": "React Router DOM",
+      "version": "6.22.0",
+      "purpose": "Client-side routing and navigation",
+      "features": ["Nested routes", "Protected routes", "Programmatic navigation"]
+    },
+    "styling": {
+      "primary_framework": "Tailwind CSS",
+      "version": "3.4.1",
+      "purpose": "Utility-first CSS framework for rapid UI development",
+      "customization": "Custom green color palette (primary-50 to primary-900) representing sustainability",
+      "design_approach": "Mobile-first responsive design with utility classes"
+    },
+    "http_client": {
+      "name": "Axios",
+      "version": "1.6.7",
+      "purpose": "HTTP client for API communication",
+      "features": ["Request/response interceptors", "Automatic token refresh", "Error handling"]
+    },
+    "data_visualization": {
+      "name": "Recharts",
+      "version": "2.15.4",
+      "purpose": "Chart library for analytics and statistics visualization"
+    },
+    "icons": {
+      "name": "Lucide React",
+      "version": "0.344.0",
+      "purpose": "Consistent icon library for UI elements"
+    },
+    "language": "JavaScript (ES6+)",
+    "package_manager": "npm",
+    "development_dependencies": {
+      "@vitejs/plugin-react": "4.2.1",
+      "autoprefixer": "10.4.23",
+      "postcss": "8.5.6"
+    }
+  },
+
+  "project_structure": {
+    "overview": "The project follows a modular React application structure with clear separation of concerns organized by feature and functionality",
+    "root_directory": {
+      "public/": "Static assets served directly to the browser",
+      "src/": "Source code directory",
+      ".env": "Environment variables (not in git)",
+      ".env.example": "Environment variables template",
+      "package.json": "Project dependencies and scripts",
+      "tailwind.config.js": "Tailwind CSS configuration",
+      "vite.config.js": "Vite build tool configuration",
+      "README.md": "Project documentation"
+    },
+    "src_directory_structure": {
+      "api/": "API integration layer - HTTP client configuration and endpoint definitions",
+      "assets/": "Static assets (images, logos, etc.)",
+      "components/": "Reusable React components organized by feature",
+      "context/": "React Context providers for global state management",
+      "pages/": "Page-level components for each route",
+      "routes/": "Route protection and navigation components",
+      "utils/": "Utility functions and helper modules",
+      "App.jsx": "Root application component with routing configuration",
+      "App.css": "Application-specific styles (minimal usage)",
+      "index.css": "Global styles and Tailwind imports",
+      "main.jsx": "Application entry point and React initialization"
+    },
+    "components_directory": {
+      "analytics/": "Analytics-specific components (ExportReports)",
+      "charities/": "Charity management components (CharityDetailsModal, CreateCharityModal)",
+      "common/": "Shared UI components (Button, Input, Table, Modal, Pagination, LoadingSpinner, Toast)",
+      "dashboard/": "Dashboard-specific components (StatCard, RecentActivity, QuickActions, UserGrowthChart)",
+      "deliveries/": "Delivery management components (DeliveryDetailsModal)",
+      "drivers/": "Driver management components (ApproveRejectModal, SetAppointmentModal)",
+      "items/": "Item management components (ItemDetailsModal)",
+      "layout/": "Layout structure components (Layout, Sidebar, Header)",
+      "orders/": "Order management components (OrderDetailsModal)",
+      "users/": "User management components (UserDetailsModal, DeleteConfirmModal, AddUserModal)"
+    }
+  },
+
+  "pages_detailed": {
+    "login_page": {
+      "route": "/login",
+      "file": "src/pages/Login.jsx",
+      "purpose": "Authentication entry point for administrators",
+      "features": [
+        "Email and password input fields with validation",
+        "Real-time form validation (email format, password minimum 8 characters)",
+        "Error display for failed login attempts",
+        "Loading state during authentication",
+        "Admin privilege verification (user_type must be 'admin')",
+        "Auto-redirect to dashboard if already authenticated",
+        "Default credentials display for development/testing"
+      ],
+      "ui_elements": {
+        "logo": "Green circular icon with shopping cart symbol",
+        "heading": "ReWear Admin",
+        "subheading": "Sign in to access the dashboard",
+        "background": "Gradient from light green (primary-50) to medium green (primary-100)",
+        "form_container": "White rounded card with shadow"
+      },
+      "validation_rules": {
+        "email": ["Required field", "Must be valid email format"],
+        "password": ["Required field", "Minimum 8 characters"]
+      },
+      "authentication_flow": [
+        "User enters email and password",
+        "Client validates input format",
+        "API call to POST /auth/login",
+        "Backend verifies credentials and returns user data with tokens",
+        "Frontend checks if user_type is 'admin'",
+        "If admin: stores access_token and refresh_token in localStorage",
+        "Redirects to dashboard (/)",
+        "If not admin: shows error 'Access denied. Admin privileges required'"
+      ]
+    },
+
+    "dashboard_page": {
+      "route": "/",
+      "file": "src/pages/Dashboard.jsx",
+      "purpose": "Main administrative overview page providing platform statistics and quick access to key functions",
+      "features": [
+        "Welcome message with admin's name",
+        "Real-time platform statistics display",
+        "User growth chart visualization",
+        "Recent activity feed",
+        "Quick action buttons for common tasks",
+        "Error handling with retry functionality",
+        "Loading states during data fetch"
+      ],
+      "statistics_displayed": {
+        "primary_stats": [
+          {
+            "title": "Total Users",
+            "icon": "Users",
+            "color": "blue",
+            "source": "API: /admin/stats"
+          },
+          {
+            "title": "Items Sold",
+            "icon": "ShoppingBag",
+            "color": "green",
+            "source": "API: /admin/stats"
+          },
+          {
+            "title": "Total Donations",
+            "icon": "Heart",
+            "color": "purple",
+            "source": "API: /admin/stats"
+          },
+          {
+            "title": "Active Drivers",
+            "icon": "Truck",
+            "color": "orange",
+            "subtitle": "Shows total drivers count",
+            "source": "API: /admin/stats"
+          }
+        ],
+        "secondary_stats": [
+          {
+            "title": "Total Charities",
+            "icon": "Heart",
+            "color": "pink"
+          },
+          {
+            "title": "Active Users",
+            "icon": "TrendingUp",
+            "color": "green"
+          },
+          {
+            "title": "Total Items",
+            "icon": "Package",
+            "color": "blue",
+            "subtitle": "Active listings"
+          }
+        ]
+      },
+      "user_growth_chart": {
+        "component": "UserGrowthChart",
+        "library": "Recharts",
+        "data_source": "Calculated from user.created_at timestamps",
+        "display": "Last 6 months of user registrations",
+        "x_axis": "Month names (Jan, Feb, etc.)",
+        "y_axis": "Number of new users"
+      },
+      "recent_activity": {
+        "component": "RecentActivity",
+        "data_source": "Most recent 5 user registrations",
+        "activity_type": "Currently shows user registrations",
+        "display_format": "User name + action + timestamp"
+      },
+      "quick_actions": {
+        "component": "QuickActions",
+        "purpose": "Fast access to common administrative tasks",
+        "actions": ["Add User", "Create Charity", "View Analytics"]
+      },
+      "layout": {
+        "top_section": "Welcome message",
+        "first_row": "4 primary statistics cards",
+        "second_row": "3 secondary statistics cards",
+        "third_row": "User growth chart (left) + Recent activity (right)",
+        "bottom": "Quick actions buttons"
+      }
+    },
+
+    "users_list_page": {
+      "route": "/users",
+      "file": "src/pages/users/UsersList.jsx",
+      "purpose": "Comprehensive user management interface for viewing, searching, filtering, and managing platform users",
+      "features": [
+        "Paginated user listing (15 users per page)",
+        "Search by name or email",
+        "Filter by user type (user, charity)",
+        "View detailed user information in modal",
+        "Delete users with confirmation",
+        "Add new users via modal form",
+        "Responsive data table with sorting",
+        "User status indicators (active/inactive)",
+        "User type badges (user, charity, admin, driver)"
+      ],
+      "table_columns": [
+        {
+          "header": "Name",
+          "display": "User avatar (first letter) + name + email",
+          "avatar_style": "Circular green background with white initial"
+        },
+        {
+          "header": "Phone",
+          "display": "Phone number"
+        },
+        {
+          "header": "Type",
+          "display": "Color-coded badge (user, charity, driver, admin)"
+        },
+        {
+          "header": "Status",
+          "display": "Active (green) / Inactive (red) badge"
+        },
+        {
+          "header": "Joined",
+          "display": "Formatted date (e.g., 'Jan 15, 2025, 10:30 AM')"
+        },
+        {
+          "header": "Actions",
+          "buttons": [
+            {
+              "icon": "Eye",
+              "action": "View details",
+              "color": "blue"
+            },
+            {
+              "icon": "Trash2",
+              "action": "Delete user",
+              "color": "red"
+            }
+          ]
+        }
+      ],
+      "modals": {
+        "UserDetailsModal": {
+          "purpose": "Display comprehensive user information",
+          "fields": ["Name", "Email", "Phone", "User Type", "Status", "Join Date", "Address", "Profile Picture"]
+        },
+        "DeleteConfirmModal": {
+          "purpose": "Confirm user deletion before executing",
+          "safety_feature": "Requires explicit confirmation to prevent accidental deletion"
+        },
+        "AddUserModal": {
+          "purpose": "Create new user accounts",
+          "form_fields": ["Name", "Email", "Phone", "Password", "User Type", "Status"],
+          "validation": "Client-side validation before API call"
+        }
+      },
+      "api_endpoints": {
+        "list": "GET /admin/users (with pagination params)",
+        "delete": "DELETE /admin/users/{userId}",
+        "create": "POST /admin/create-user"
+      },
+      "filter_options": {
+        "search": "Searches name and email fields",
+        "user_type": "All Types, Users, Charities"
+      }
+    },
+
+    "items_list_page": {
+      "route": "/items",
+      "file": "src/pages/items/ItemsList.jsx",
+      "purpose": "Manage donated items listed on the platform",
+      "features": [
+        "View all donated items with pagination",
+        "Search items by name or description",
+        "Filter by item category",
+        "View detailed item information including images",
+        "Delete inappropriate or invalid items",
+        "Item status tracking (available, sold, donated, etc.)"
+      ],
+      "table_columns": [
+        {"header": "Item", "display": "Thumbnail + name"},
+        {"header": "Category", "display": "Category name"},
+        {"header": "Size", "display": "Size information"},
+        {"header": "Condition", "display": "Item condition (new, good, fair)"},
+        {"header": "Price", "display": "Formatted currency (USD)"},
+        {"header": "Status", "display": "Availability status"},
+        {"header": "Donor", "display": "Donor name"},
+        {"header": "Listed Date", "display": "Formatted date"},
+        {"header": "Actions", "display": "View, Delete buttons"}
+      ],
+      "api_endpoints": {
+        "list": "GET /items",
+        "details": "GET /items/{itemId}",
+        "delete": "DELETE /items/{itemId}",
+        "update": "PUT /items/{itemId}"
+      }
+    },
+
+    "orders_list_page": {
+      "route": "/orders",
+      "file": "src/pages/orders/OrdersList.jsx",
+      "purpose": "Manage and track all customer orders on the platform",
+      "features": [
+        "View all orders with pagination",
+        "Filter by order status (pending, processing, completed, cancelled)",
+        "View detailed order information including items",
+        "Update order status",
+        "Cancel orders with reason",
+        "Track order timeline"
+      ],
+      "order_statuses": ["pending", "processing", "shipped", "delivered", "cancelled"],
+      "table_columns": [
+        {"header": "Order ID", "display": "Unique order identifier"},
+        {"header": "Customer", "display": "Customer name and email"},
+        {"header": "Items", "display": "Count of items in order"},
+        {"header": "Total", "display": "Formatted total amount"},
+        {"header": "Status", "display": "Color-coded status badge"},
+        {"header": "Date", "display": "Order date"},
+        {"header": "Actions", "display": "View details, Update status, Cancel"}
+      ],
+      "modals": {
+        "OrderDetailsModal": {
+          "display": "Customer info, items list, shipping address, payment status, timeline"
+        }
+      },
+      "api_endpoints": {
+        "list": "GET /orders",
+        "details": "GET /orders/{orderId}",
+        "update_status": "PUT /orders/{orderId} with status",
+        "cancel": "PUT /orders/{orderId}/cancel with reason"
+      }
+    },
+
+    "driver_applications_page": {
+      "route": "/drivers",
+      "file": "src/pages/drivers/DriverApplicationsList.jsx",
+      "purpose": "Review and manage driver applications for delivery services",
+      "features": [
+        "View all driver applications",
+        "Filter by application status (pending, approved, rejected)",
+        "Review driver details (license, vehicle, experience)",
+        "Approve applications with notes",
+        "Reject applications with reasons",
+        "Set appointment for interviews or training",
+        "View application documents"
+      ],
+      "application_statuses": ["pending", "approved", "rejected", "under_review"],
+      "table_columns": [
+        {"header": "Driver", "display": "Name + photo"},
+        {"header": "Phone", "display": "Contact number"},
+        {"header": "License", "display": "License number"},
+        {"header": "Vehicle", "display": "Vehicle type and plate"},
+        {"header": "Experience", "display": "Years of experience"},
+        {"header": "Status", "display": "Application status badge"},
+        {"header": "Applied Date", "display": "Application date"},
+        {"header": "Actions", "display": "View, Approve, Reject, Set Appointment"}
+      ],
+      "modals": {
+        "ApproveRejectModal": {
+          "actions": ["Approve with admin notes", "Reject with reason"],
+          "feedback": "Textarea for providing approval notes or rejection reasons"
+        },
+        "SetAppointmentModal": {
+          "purpose": "Schedule interview or training appointment",
+          "fields": ["Date", "Time", "Location", "Notes"]
+        }
+      },
+      "api_endpoints": {
+        "list": "GET /admin/driver-applications",
+        "details": "GET /admin/driver-applications/{id}",
+        "approve": "POST /admin/driver-applications/{id}/approve",
+        "reject": "POST /admin/driver-applications/{id}/reject",
+        "set_appointment": "POST /admin/driver-applications/{id}/appointment"
+      }
+    },
+
+    "charities_list_page": {
+      "route": "/charities",
+      "file": "src/pages/charities/CharitiesList.jsx",
+      "purpose": "Manage charity partner organizations",
+      "features": [
+        "View all registered charity organizations",
+        "Create new charity profiles",
+        "View charity details and mission",
+        "Track charity donation receipts",
+        "Update charity information",
+        "Deactivate charities"
+      ],
+      "table_columns": [
+        {"header": "Charity", "display": "Logo + name"},
+        {"header": "Category", "display": "Focus area (environment, education, health, etc.)"},
+        {"header": "Contact", "display": "Email + phone"},
+        {"header": "Location", "display": "City, country"},
+        {"header": "Status", "display": "Active/inactive badge"},
+        {"header": "Donations Received", "display": "Count or amount"},
+        {"header": "Joined Date", "display": "Registration date"},
+        {"header": "Actions", "display": "View details, Edit"}
+      ],
+      "modals": {
+        "CharityDetailsModal": {
+          "display": "Full charity information, mission statement, contact details, donation history"
+        },
+        "CreateCharityModal": {
+          "form_fields": ["Name", "Category", "Description", "Email", "Phone", "Address", "Logo URL"]
+        }
+      },
+      "api_endpoints": {
+        "list": "GET /admin/charities",
+        "create": "POST /admin/charity/create"
+      }
+    },
+
+    "deliveries_list_page": {
+      "route": "/deliveries",
+      "file": "src/pages/deliveries/DeliveriesList.jsx",
+      "purpose": "Track and manage all delivery operations",
+      "features": [
+        "View all deliveries with real-time status",
+        "Filter by delivery status",
+        "Assign drivers to deliveries",
+        "View delivery details and route",
+        "Cancel deliveries if necessary",
+        "Track delivery progress"
+      ],
+      "delivery_statuses": ["pending", "assigned", "in_transit", "delivered", "cancelled"],
+      "status_colors": {
+        "pending": "orange",
+        "assigned": "blue",
+        "in_transit": "indigo",
+        "delivered": "green",
+        "cancelled": "red"
+      },
+      "table_columns": [
+        {"header": "Delivery ID", "display": "Unique identifier"},
+        {"header": "Order", "display": "Associated order ID"},
+        {"header": "Customer", "display": "Recipient name"},
+        {"header": "Driver", "display": "Assigned driver or 'Unassigned'"},
+        {"header": "Pickup", "display": "Pickup address"},
+        {"header": "Drop-off", "display": "Delivery address"},
+        {"header": "Status", "display": "Color-coded badge"},
+        {"header": "Created", "display": "Creation date"},
+        {"header": "Actions", "display": "View details, Assign driver, Cancel"}
+      ],
+      "modals": {
+        "DeliveryDetailsModal": {
+          "display": "Full route information, driver details, timestamps, tracking history"
+        }
+      },
+      "api_endpoints": {
+        "list": "GET /deliveries",
+        "details": "GET /deliveries/{deliveryId}",
+        "assign_driver": "POST /deliveries/{deliveryId}/assign-driver",
+        "cancel": "POST /deliveries/{deliveryId}/cancel"
+      }
+    },
+
+    "analytics_dashboard_page": {
+      "route": "/analytics",
+      "file": "src/pages/analytics/AnalyticsDashboard.jsx",
+      "purpose": "Comprehensive analytics and reporting interface for platform insights",
+      "features": [
+        "Real-time platform statistics",
+        "Date range filtering (7 days, 30 days, 90 days, 1 year)",
+        "Export reports functionality",
+        "Key metrics dashboard"
+      ],
+      "displayed_metrics": [
+        {"title": "Total Users", "icon": "Users", "color": "blue"},
+        {"title": "Total Charities", "icon": "Package", "color": "green"},
+        {"title": "Total Drivers", "icon": "TrendingUp", "color": "purple"},
+        {"title": "Verified Drivers", "icon": "DollarSign", "color": "orange"}
+      ],
+      "date_range_options": [
+        {"value": "7", "label": "Last 7 days"},
+        {"value": "30", "label": "Last 30 days"},
+        {"value": "90", "label": "Last 90 days"},
+        {"value": "365", "label": "Last year"}
+      ],
+      "export_functionality": {
+        "component": "ExportReports",
+        "formats": ["CSV", "PDF"],
+        "report_types": ["User Statistics", "Sales Report", "Delivery Analytics"]
+      },
+      "future_enhancements_note": "Charts for revenue trends, category distribution, and custom visualizations planned for future iterations when more data is available"
+    },
+
+    "profile_page": {
+      "route": "/profile",
+      "file": "src/pages/Profile.jsx",
+      "purpose": "Admin profile management and settings",
+      "features": [
+        "View and update personal information",
+        "Change password",
+        "Update profile picture",
+        "Manage account settings"
+      ],
+      "form_fields": ["Name", "Email", "Phone", "Current Password", "New Password", "Confirm Password"],
+      "api_endpoints": {
+        "get_profile": "GET /auth/me",
+        "update_profile": "PUT /auth/profile",
+        "change_password": "PUT /auth/password"
+      }
+    },
+
+    "notifications_page": {
+      "route": "/notifications",
+      "file": "src/pages/Notifications.jsx",
+      "purpose": "View and manage system notifications",
+      "features": [
+        "View all notifications",
+        "Mark notifications as read",
+        "Delete notifications",
+        "Mark all as read",
+        "Filter by type (info, warning, error, success)"
+      ],
+      "notification_types": [
+        {"type": "info", "icon": "Info", "color": "blue"},
+        {"type": "warning", "icon": "AlertTriangle", "color": "yellow"},
+        {"type": "error", "icon": "XCircle", "color": "red"},
+        {"type": "success", "icon": "CheckCircle", "color": "green"}
+      ],
+      "api_endpoints": {
+        "list": "GET /admin/notifications",
+        "mark_read": "POST /admin/notifications/{id}/read",
+        "delete": "DELETE /admin/notifications/{id}",
+        "mark_all_read": "POST /admin/notifications/read-all"
+      }
+    }
+  },
+
+  "components_catalog": {
+    "common_components": {
+      "Button": {
+        "file": "src/components/common/Button.jsx",
+        "purpose": "Reusable button component with consistent styling",
+        "variants": ["primary", "secondary", "danger", "success", "warning"],
+        "sizes": ["sm", "md", "lg"],
+        "features": ["Loading state with spinner", "Disabled state", "Full width option", "Icon support"],
+        "styling": "Tailwind classes with hover effects and transitions"
+      },
+      "Input": {
+        "file": "src/components/common/Input.jsx",
+        "purpose": "Enhanced input field with validation and icon support",
+        "features": ["Label display", "Error message display", "Icon rendering", "Placeholder text", "Required indicator", "Auto-complete support"],
+        "validation": "Client-side error display",
+        "types_supported": ["text", "email", "password", "number", "tel"]
+      },
+      "Table": {
+        "file": "src/components/common/Table.jsx",
+        "purpose": "Reusable data table component for listing data",
+        "features": ["Sortable columns", "Custom cell rendering", "Loading state", "Empty state message", "Responsive design"],
+        "props": ["columns (array)", "data (array)", "loading (boolean)", "emptyMessage (string)"]
+      },
+      "Modal": {
+        "file": "src/components/common/Modal.jsx",
+        "purpose": "Base modal component for dialogs and overlays",
+        "features": ["Open/close state", "Backdrop overlay", "Close on backdrop click", "Close on escape key", "Custom header and footer"],
+        "accessibility": ["Focus trapping", "ARIA attributes", "Keyboard navigation"]
+      },
+      "Pagination": {
+        "file": "src/components/common/Pagination.jsx",
+        "purpose": "Pagination controls for data tables",
+        "features": ["Page numbers display", "Previous/Next buttons", "Click to jump to page", "Current page highlighting"],
+        "display_logic": "Shows page numbers with ellipsis for large page counts"
+      },
+      "LoadingSpinner": {
+        "file": "src/components/common/LoadingSpinner.jsx",
+        "purpose": "Loading indicator for async operations",
+        "sizes": ["sm", "md", "lg"],
+        "features": ["Optional text message", "Centered display", "Animated spinning"]
+      },
+      "Toast": {
+        "file": "src/components/common/Toast.jsx",
+        "purpose": "Notification toast for user feedback",
+        "types": ["success", "error", "warning", "info"],
+        "features": ["Auto-dismiss after timeout", "Manual close button", "Position (top-right)", "Stack multiple toasts"]
+      }
+    },
+    "dashboard_components": {
+      "StatCard": {
+        "file": "src/components/dashboard/StatCard.jsx",
+        "purpose": "Display single statistic with icon",
+        "props": ["title", "value", "icon", "color", "subtitle"],
+        "colors": ["blue", "green", "purple", "orange", "red"],
+        "layout": "Icon on right, title and value on left"
+      },
+      "RecentActivity": {
+        "file": "src/components/dashboard/RecentActivity.jsx",
+        "purpose": "Show list of recent activities",
+        "display": "Activity type, title, description, timestamp",
+        "styling": "Clean list with icons and relative timestamps"
+      },
+      "QuickActions": {
+        "file": "src/components/dashboard/QuickActions.jsx",
+        "purpose": "Fast access buttons for common tasks",
+        "actions": ["Add User", "Create Charity", "View Analytics"],
+        "styling": "Card layout with icon buttons"
+      },
+      "UserGrowthChart": {
+        "file": "src/components/dashboard/UserGrowthChart.jsx",
+        "purpose": "Line chart showing user registration trends",
+        "library": "Recharts",
+        "chart_type": "LineChart",
+        "data_format": "Array of {month, users} objects"
+      }
+    },
+    "layout_components": {
+      "Layout": {
+        "file": "src/components/layout/Layout.jsx",
+        "purpose": "Main layout wrapper with sidebar and header",
+        "structure": {
+          "sidebar": "Navigation menu",
+          "header": "Top bar with user info and notifications",
+          "main_content": "Page content area"
+        },
+        "responsive_behavior": "Collapsible sidebar on mobile"
+      },
+      "Sidebar": {
+        "file": "src/components/layout/Sidebar.jsx",
+        "purpose": "Navigation sidebar with menu items",
+        "menu_items": [
+          {"path": "/", "label": "Dashboard", "icon": "LayoutDashboard"},
+          {"path": "/users", "label": "Users", "icon": "Users"},
+          {"path": "/items", "label": "Items", "icon": "ShoppingBag"},
+          {"path": "/orders", "label": "Orders", "icon": "Package"},
+          {"path": "/deliveries", "label": "Deliveries", "icon": "Truck"},
+          {"path": "/drivers", "label": "Drivers", "icon": "Truck"},
+          {"path": "/charities", "label": "Charities", "icon": "Heart"},
+          {"path": "/analytics", "label": "Analytics", "icon": "BarChart3"}
+        ],
+        "bottom_menu": [
+          {"path": "/profile", "label": "Profile", "icon": "User"},
+          {"path": "/notifications", "label": "Notifications", "icon": "Bell"}
+        ],
+        "features": [
+          "Active route highlighting",
+          "Mobile responsive with overlay",
+          "Collapsible on mobile",
+          "Logo display",
+          "Footer with version info"
+        ]
+      },
+      "Header": {
+        "file": "src/components/layout/Header.jsx",
+        "purpose": "Top navigation bar",
+        "elements": [
+          "Mobile menu toggle button",
+          "Page title",
+          "User profile dropdown",
+          "Notifications bell icon",
+          "Logout button"
+        ]
+      }
+    }
+  },
+
+  "api_integration": {
+    "overview": "Centralized API integration layer with Axios HTTP client, automatic authentication, and token refresh mechanism",
+    "configuration": {
+      "file": "src/api/axios.js",
+      "base_url": "Configured via VITE_API_BASE_URL environment variable",
+      "default_timeout": "30000ms (30 seconds)",
+      "default_headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      }
+    },
+    "authentication": {
+      "method": "JWT (JSON Web Tokens)",
+      "token_types": ["access_token", "refresh_token"],
+      "storage": "localStorage",
+      "header_format": "Authorization: Bearer {access_token}"
+    },
+    "interceptors": {
+      "request_interceptor": {
+        "purpose": "Automatically add access token to every request",
+        "implementation": "Adds Authorization header before sending request"
+      },
+      "response_interceptor": {
+        "purpose": "Handle token refresh on 401 errors",
+        "implementation": [
+          "Detects 401 Unauthorized response",
+          "Attempts to refresh token using refresh_token",
+          "Retries original request with new token",
+          "Queues concurrent requests during refresh",
+          "Redirects to login if refresh fails"
+        ]
+      }
+    },
+    "api_endpoints": {
+      "authentication": {
+        "login": "POST /auth/login",
+        "logout": "POST /auth/logout",
+        "get_profile": "GET /auth/me",
+        "update_profile": "PUT /auth/profile",
+        "change_password": "PUT /auth/password",
+        "refresh_token": "POST /auth/refresh-token"
+      },
+      "admin_operations": {
+        "get_statistics": "GET /admin/stats",
+        "get_users": "GET /admin/users",
+        "create_user": "POST /admin/create-user",
+        "delete_user": "DELETE /admin/users/{userId}",
+        "get_charities": "GET /admin/charities",
+        "create_charity": "POST /admin/charity/create",
+        "get_notifications": "GET /admin/notifications",
+        "mark_notification_read": "POST /admin/notifications/{id}/read",
+        "delete_notification": "DELETE /admin/notifications/{id}",
+        "mark_all_read": "POST /admin/notifications/read-all",
+        "get_driver_applications": "GET /admin/driver-applications",
+        "get_driver_details": "GET /admin/driver-applications/{id}",
+        "approve_driver": "POST /admin/driver-applications/{id}/approve",
+        "reject_driver": "POST /admin/driver-applications/{id}/reject",
+        "set_driver_appointment": "POST /admin/driver-applications/{id}/appointment"
+      },
+      "items": {
+        "get_items": "GET /items",
+        "get_item_details": "GET /items/{itemId}",
+        "delete_item": "DELETE /items/{itemId}",
+        "update_item": "PUT /items/{itemId}"
+      },
+      "orders": {
+        "get_orders": "GET /orders",
+        "get_order_details": "GET /orders/{orderId}",
+        "update_status": "PUT /orders/{orderId}",
+        "cancel_order": "PUT /orders/{orderId}/cancel"
+      },
+      "deliveries": {
+        "get_deliveries": "GET /deliveries",
+        "get_delivery_details": "GET /deliveries/{deliveryId}",
+        "assign_driver": "POST /deliveries/{deliveryId}/assign-driver",
+        "cancel_delivery": "POST /deliveries/{deliveryId}/cancel"
+      }
+    },
+    "error_handling": {
+      "network_errors": "Caught and displayed as user-friendly messages",
+      "401_errors": "Trigger token refresh flow",
+      "403_errors": "Access denied message",
+      "404_errors": "Resource not found message",
+      "500_errors": "Server error message with retry option",
+      "validation_errors": "Display specific field errors from backend"
+    }
+  },
+
+  "authentication_and_security": {
+    "authentication_system": {
+      "type": "JWT (JSON Web Token) based authentication",
+      "token_flow": [
+        "User submits login credentials",
+        "Backend validates and returns access_token + refresh_token",
+        "Frontend stores tokens in localStorage",
+        "Access token sent in Authorization header for all requests",
+        "When access token expires (401 response), refresh token used to get new access token",
+        "If refresh fails, user redirected to login"
+      ]
+    },
+    "access_control": {
+      "admin_verification": "Login checks if user_type === 'admin'",
+      "protected_routes": "All routes except /login require authentication",
+      "route_protection_component": "ProtectedRoute (src/routes/ProtectedRoute.jsx)"
+    },
+    "security_features": {
+      "token_storage": "localStorage (client-side storage)",
+      "automatic_token_refresh": "Implemented via Axios interceptor",
+      "session_management": "AuthContext maintains user state",
+      "logout_handling": "Clears tokens and redirects to login"
+    },
+    "auth_context": {
+      "file": "src/context/AuthContext.jsx",
+      "provided_state": ["user", "loading", "error", "isAuthenticated"],
+      "provided_functions": ["login(email, password)", "logout()", "updateUser(data)"],
+      "auth_check": "Automatically checks authentication on app mount"
+    }
+  },
+
+  "state_management": {
+    "approach": "React Context API for global state, component-level useState for local state",
+    "global_state": {
+      "AuthContext": {
+        "purpose": "Manage authentication state across the app",
+        "state": ["user (object)", "loading (boolean)", "error (string)"],
+        "actions": ["login", "logout", "updateUser"]
+      },
+      "ToastContext": {
+        "purpose": "Manage toast notifications globally",
+        "state": ["toasts (array)"],
+        "actions": ["showToast(message, type)", "removeToast(id)"]
+      }
+    },
+    "local_state": {
+      "usage": "Each page component manages its own state",
+      "typical_state": [
+        "data (array) - fetched data",
+        "loading (boolean) - loading state",
+        "error (string) - error messages",
+        "pagination (object) - current page, total pages",
+        "filters (object) - search term, filter options",
+        "modals (object) - modal open/close states"
+      ]
+    },
+    "no_redux": "Project does NOT use Redux, Zustand, or other state management libraries"
+  },
+
+  "styling_and_design": {
+    "design_system": {
+      "framework": "Tailwind CSS",
+      "philosophy": "Utility-first CSS with custom theme extensions",
+      "color_palette": {
+        "primary": "Green gradient (50-900) representing sustainability and eco-friendliness",
+        "shades": {
+          "primary-50": "#f0fdf4 (lightest)",
+          "primary-100": "#dcfce7",
+          "primary-200": "#bbf7d0",
+          "primary-300": "#86efac",
+          "primary-400": "#4ade80",
+          "primary-500": "#22c55e (primary brand color)",
+          "primary-600": "#16a34a (darker for hover states)",
+          "primary-700": "#15803d",
+          "primary-800": "#166534",
+          "primary-900": "#14532d (darkest)"
+        }
+      },
+      "semantic_colors": {
+        "success": "green",
+        "warning": "yellow/orange",
+        "error": "red",
+        "info": "blue"
+      }
+    },
+    "typography": {
+      "headings": "Font-bold with text-gray-900",
+      "body": "Font-normal with text-gray-600/700",
+      "sizes": ["text-xs", "text-sm", "text-base", "text-lg", "text-xl", "text-2xl", "text-3xl"]
+    },
+    "components_styling": {
+      "cards": "bg-white rounded-lg shadow border border-gray-200",
+      "buttons": "Rounded-lg with hover transitions",
+      "inputs": "Rounded-lg border border-gray-300 with focus ring",
+      "modals": "Backdrop with centered white rounded card",
+      "tables": "Clean rows with hover states on actions"
+    },
+    "responsive_design": {
+      "breakpoints": ["sm (640px)", "md (768px)", "lg (1024px)", "xl (1280px)"],
+      "approach": "Mobile-first - design for mobile, then enhance for larger screens",
+      "sidebar_behavior": "Hidden on mobile with hamburger menu, fixed on desktop"
+    },
+    "animations": {
+      "transitions": "All interactive elements have transition-colors or transition-all",
+      "loading": "Spinning animation for loading spinner",
+      "slide_in": "Custom animation defined in index.css"
+    },
+    "custom_css": {
+      "file": "src/index.css",
+      "additions": ["Custom scrollbar styling", "Animation keyframes"],
+      "tailwind_import": "@tailwind base; @tailwind components; @tailwind utilities;"
+    }
+  },
+
+  "routing_structure": {
+    "router": "React Router v6 (BrowserRouter)",
+    "configuration_file": "src/App.jsx",
+    "route_structure": {
+      "public_routes": [
+        {
+          "path": "/login",
+          "component": "Login",
+          "access": "Anyone (redirects to / if already authenticated)"
+        }
+      ],
+      "protected_routes": [
+        {
+          "path": "/",
+          "component": "Dashboard",
+          "layout": "Layout wrapper",
+          "access": "Authenticated admins only"
+        },
+        {
+          "path": "/users",
+          "component": "UsersList",
+          "layout": "Layout wrapper"
+        },
+        {
+          "path": "/items",
+          "component": "ItemsList",
+          "layout": "Layout wrapper"
+        },
+        {
+          "path": "/orders",
+          "component": "OrdersList",
+          "layout": "Layout wrapper"
+        },
+        {
+          "path": "/drivers",
+          "component": "DriverApplicationsList",
+          "layout": "Layout wrapper"
+        },
+        {
+          "path": "/charities",
+          "component": "CharitiesList",
+          "layout": "Layout wrapper"
+        },
+        {
+          "path": "/deliveries",
+          "component": "DeliveriesList",
+          "layout": "Layout wrapper"
+        },
+        {
+          "path": "/analytics",
+          "component": "AnalyticsDashboard",
+          "layout": "Layout wrapper"
+        },
+        {
+          "path": "/profile",
+          "component": "Profile",
+          "layout": "Layout wrapper"
+        },
+        {
+          "path": "/notifications",
+          "component": "Notifications",
+          "layout": "Layout wrapper"
+        }
+      ],
+      "catch_all_route": {
+        "path": "*",
+        "behavior": "Redirects to / (dashboard)"
+      }
+    },
+    "protected_route_component": {
+      "file": "src/routes/ProtectedRoute.jsx",
+      "behavior": [
+        "Checks if user is authenticated via AuthContext",
+        "Shows loading spinner while checking",
+        "Redirects to /login if not authenticated",
+        "Renders children if authenticated"
+      ]
+    },
+    "navigation": {
+      "sidebar_links": "All main routes accessible via sidebar",
+      "programmatic": "useNavigate hook for programmatic navigation"
+    }
+  },
+
+  "utility_functions": {
+    "file": "src/utils/helpers.js",
+    "functions": {
+      "formatDate": {
+        "purpose": "Convert date string to readable format",
+        "output": "Jan 15, 2025, 10:30 AM",
+        "uses": "Intl.DateTimeFormat"
+      },
+      "formatCurrency": {
+        "purpose": "Format numbers as currency",
+        "output": "$1,234.56",
+        "currency": "USD",
+        "uses": "Intl.NumberFormat"
+      },
+      "truncate": {
+        "purpose": "Truncate long text",
+        "default_length": 50 characters,
+        "output": "Text..."
+      },
+      "getErrorMessage": {
+        "purpose": "Extract user-friendly error from API response",
+        "checks": ["response.data.message", "response.data.error", "error.message"],
+        "fallback": "An unexpected error occurred"
+      },
+      "getDeliveryStatusColor": {
+        "purpose": "Get color name for delivery status",
+        "mapping": {
+          "pending": "orange",
+          "assigned": "blue",
+          "in_transit": "indigo",
+          "delivered": "green",
+          "cancelled": "red"
+        }
+      },
+      "getDeliveryStatusDisplay": {
+        "purpose": "Get human-readable status text",
+        "mapping": {
+          "pending": "Pending",
+          "assigned": "Assigned",
+          "in_transit": "In Transit",
+          "delivered": "Delivered",
+          "cancelled": "Cancelled"
+        }
+      },
+      "getDeliveryStatusBadge": {
+        "purpose": "Get Tailwind classes for status badge",
+        "output": "Complete CSS class string for badges"
+      },
+      "capitalize": {
+        "purpose": "Capitalize first letter of string",
+        "input": "hello",
+        "output": "Hello"
+      }
+    }
+  },
+
+  "token_storage": {
+    "file": "src/utils/tokenStorage.js",
+    "functions": {
+      "getAccessToken": "Retrieve access token from localStorage",
+      "getRefreshToken": "Retrieve refresh token from localStorage",
+      "setTokens": "Store both access and refresh tokens",
+      "clearTokens": "Remove both tokens from localStorage",
+      "isAuthenticated": "Check if access token exists"
+    },
+    "storage_keys": {
+      "access_token": "access_token",
+      "refresh_token": "refresh_token"
+    }
+  },
+
+  "development_workflow": {
+    "scripts": {
+      "dev": "vite - Start development server with hot reload",
+      "build": "vite build - Create production build in dist/",
+      "preview": "vite preview - Preview production build locally"
+    },
+    "development_server": {
+      "port": 3000,
+      "url": "http://localhost:3000",
+      "features": ["Hot Module Replacement", "Fast Refresh"]
+    },
+    "build_output": {
+      "directory": "dist/",
+      "contents": ["Optimized JavaScript", "Minified CSS", "Asset files", "index.html"]
+    }
+  },
+
+  "environment_configuration": {
+    "env_file": ".env (not in git)",
+    "env_example_file": ".env.example (in git for reference)",
+    "variables": {
+      "VITE_API_BASE_URL": {
+        "purpose": "Backend API base URL",
+        "default": "http://localhost:8000/api",
+        "usage": "All API calls use this base URL"
+      },
+      "VITE_APP_NAME": {
+        "purpose": "Application name",
+        "default": "ReWear Admin"
+      }
+    },
+    "access_in_code": "import.meta.env.VITE_*"
+  },
+
+  "key_features_summary": {
+    "user_management": {
+      "capabilities": ["View all users", "Search and filter", "Add new users", "Delete users", "View user details"],
+      "user_types": ["user", "charity", "driver", "admin"]
+    },
+    "item_management": {
+      "capabilities": ["View all items", "Item details", "Delete items", "Category filtering", "Status tracking"]
+    },
+    "order_management": {
+      "capabilities": ["View all orders", "Update order status", "Cancel orders", "Order details", "Status filtering"]
+    },
+    "driver_management": {
+      "capabilities": ["Review applications", "Approve drivers", "Reject drivers", "Set appointments", "View driver details"]
+    },
+    "charity_management": {
+      "capabilities": ["View charities", "Create charity profiles", "Charity details", "Track donations"]
+    },
+    "delivery_management": {
+      "capabilities": ["Track deliveries", "Assign drivers", "View delivery details", "Cancel deliveries", "Status tracking"]
+    },
+    "analytics": {
+      "capabilities": ["Platform statistics", "User growth tracking", "Date range filtering", "Export reports"]
+    },
+    "notifications": {
+      "capabilities": ["View notifications", "Mark as read", "Delete notifications", "Type-based filtering"]
+    }
+  },
+
+  "user_experience_features": {
+    "loading_states": "All async operations show loading indicators",
+    "error_handling": "User-friendly error messages with retry options",
+    "feedback": "Toast notifications for user actions",
+    "confirmations": "Delete operations require confirmation",
+    "empty_states": "Friendly messages when no data is available",
+    "responsive_design": "Works on desktop, tablet, and mobile devices",
+    "accessibility": ["Semantic HTML", "ARIA labels", "Keyboard navigation", "Focus management"],
+    "performance": ["Code splitting", "Lazy loading", "Optimized builds"]
+  },
+
+  "future_enhancement_opportunities": {
+    "analytics": [
+      "Revenue trends chart",
+      "Category distribution pie chart",
+      "Custom date range picker",
+      "PDF report generation with charts",
+      "Real-time data updates"
+    ],
+    "user_management": [
+      "Bulk user operations",
+      "User activity history",
+      "Export user list to CSV",
+      "User email notifications"
+    ],
+    "general": [
+      "Dark mode theme",
+      "Multi-language support",
+      "Advanced search with filters",
+      "Audit log for admin actions",
+      "Real-time notifications with WebSocket"
+    ]
+  },
+
+  "project_strengths": {
+    "architecture": "Clean, modular component structure with clear separation of concerns",
+    "code_quality": "Consistent naming conventions, well-organized code",
+    "maintainability": "Easy to understand, modify, and extend",
+    "user_experience": "Intuitive interface with smooth interactions",
+    "performance": "Fast development server, optimized production builds",
+    "security": "JWT authentication with automatic token refresh",
+    "scalability": "Component-based design allows easy feature additions",
+    "documentation": "This comprehensive JSON documentation for full project understanding"
+  },
+
+  "project_statistics": {
+    "total_pages": 11,
+    "total_components": 20+,
+    "api_endpoints_consumed": 30+,
+    "contexts": 2 (AuthContext, ToastContext),
+    "routes": 11 (1 public, 10 protected),
+    "dependencies": 7 (React, React Router, Axios, Tailwind, Recharts, Lucide, Vite)
+  }
+}

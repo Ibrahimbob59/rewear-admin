@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Bell, Check, Trash2, Calendar, User, Package, ShoppingCart, Send, TestTube } from 'lucide-react'
 import { adminAPI } from '../api/endpoints'
 import { formatDate } from '../utils/helpers'
@@ -113,7 +113,9 @@ const Notifications = () => {
         fetchNotifications()
       }
     } catch (error) {
-      showToast('Failed to send test notification', 'error')
+      console.error('Error sending test admin notification:', error.response?.data)
+      const message = error.response?.data?.message || error.response?.data?.error || 'Failed to send test notification'
+      showToast(message, 'error')
     }
   }
 
@@ -129,7 +131,9 @@ const Notifications = () => {
         fetchNotifications()
       }
     } catch (error) {
-      showToast('Failed to send test notification', 'error')
+      console.error('Error sending test user notification:', error.response?.data)
+      const message = error.response?.data?.message || error.response?.data?.error || 'Failed to send test notification'
+      showToast(message, 'error')
     }
   }
 
